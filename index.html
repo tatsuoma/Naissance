@@ -37,10 +37,11 @@
   </div>
 
   <script>
-    const PASSWORD = "testmdp";
-    const SHEET_URL = "https://script.google.com/macros/s/AKfycbz_6N2KHUPOj8U6NgLU1myvZX2bTB-QQLTsPuYDacAGtC2-3VdgMdstJQ0p50hTV_mg/exec";
+    const PASSWORD = "testmdp"; // Attention: Ce mot de passe est visible dans le code source!
+    const SHEET_URL = "https://script.google.com/macros/s/AKfycbyinCX6L88YD-76Tw2rX-hZaGjWamD-mMnRmFW0HB4EyPM28KvVlzydxvtAZ8ri1vSx/exec";
     const STORAGE_KEY = "naissance_reservations";
 
+    // Liste des articles avec leurs URLs
     const articles = [
       { name: "Chaise haute Sweety Fox", url: "https://www.amazon.fr/dp/B07FDRX1XN" },
       { name: "Langes Orchestra", url: "https://fr.shop-orchestra.com/fr/puericulture/repas/bavoir-et-lange/lange/lot-de-6-langes-en-coton-70-x-70-cm-PBRIA2.html" },
@@ -52,39 +53,52 @@
       { name: "Soin Rebozo - à domicile", url: "https://www.infinibiennaitre.fr/soin-rebozo-fermeture-postnatal" }
     ];
 
+    let currentReservations = {}; // Stockage des réservations récupérées du Google Sheet
+
+    // --- Fonctions d'authentification et de chargement initial ---
     function checkPassword() {
       const input = document.getElementById('password').value;
       if (input === PASSWORD) {
         document.getElementById('auth').classList.add('hidden');
         document.getElementById('content').classList.remove('hidden');
-        renderArticles();
+        loadReservationsAndRender(); // Charge les réservations et affiche les articles
       } else {
         document.getElementById('error').classList.remove('hidden');
       }
     }
 
-    function getReservations() {
-      // Simuler le localStorage avec une variable globale pour cette démo
-      if (!window.reservationsData) {
-        window.reservationsData = {};
+    async function loadReservationsAndRender() {
+      showToast('Chargement des réservations...', false);
+      try {
+        const response = await fetch(SHEET_URL, {
+          method: 'GET',
+          mode: 'cors'
+        });
+
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP ! statut: ${response.status}`);
+        }
+
+        const data = await response.json();
+        currentReservations = {}; // Réinitialise les réservations à chaque chargement
+        if (Array.isArray(data)) {
+          data.forEach(res => {
+            currentReservations[res.article] = res.name;
+          });
+          showToast('Réservations chargées.', false);
+        } else if (data.error) {
+           showToast(`Erreur au chargement: ${data.error}`, true);
+        }
+        
+      } catch (err) {
+        console.error("Erreur de chargement des réservations:", err);
+        showToast("Erreur de connexion aux réservations distantes.", true);
+      } finally {
+        renderArticles(); // Affiche les articles une fois les réservations chargées (ou en cas d'erreur)
       }
-      return window.reservationsData;
     }
 
-    function setReservation(article, name) {
-      if (!window.reservationsData) {
-        window.reservationsData = {};
-      }
-      window.reservationsData[article] = name;
-    }
-
-    function removeReservation(article) {
-      if (window.reservationsData) {
-        delete window.reservationsData[article];
-      }
-      renderArticles();
-    }
-
+    // --- Fonctions de gestion de l'UI ---
     function showToast(message, isError = false) {
       const toast = document.getElementById('toast');
       const toastMessage = document.getElementById('toast-message');
@@ -102,19 +116,18 @@
 
     function renderArticles() {
       const container = document.getElementById('article-grid');
-      const reservations = getReservations();
       container.innerHTML = '';
       
       articles.forEach(article => {
-        const reservedBy = reservations[article.name];
+        const reservedBy = currentReservations[article.name]; // Utilise les réservations du sheet
         const card = document.createElement('div');
         card.className = "bg-white p-4 rounded-xl shadow";
         card.innerHTML = `
           <h2 class="text-lg font-bold text-indigo-700 mb-1">${article.name}</h2>
           <a href="${article.url}" target="_blank" class="text-blue-600 underline text-sm">Voir l'article</a>
           ${reservedBy ? `
-            <p class="mt-3 text-sm text-gray-700">${reservedBy} a réservé cet article.</p>
-            <button onclick="removeReservation('${article.name.replace(/'/g, "\\\'")}')" class="mt-2 bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600">Annuler la réservation</button>
+            <p class="mt-3 text-sm text-gray-700">Réservé par : <span class="font-semibold">${reservedBy}</span></p>
+            <button onclick="confirmCancelReservation('${article.name.replace(/'/g, "\\\'")}', '${reservedBy.replace(/'/g, "\\\'")}')" class="mt-2 bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600">Annuler ma réservation</button>
           ` : `
             <button onclick="openModal('${article.name.replace(/'/g, "\\\'")}')" class="mt-3 bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">Je réserve</button>
           `}
@@ -127,12 +140,27 @@
       document.getElementById('modal').classList.remove('hidden');
       document.getElementById('modal-item-name').textContent = itemName;
       document.getElementById('current-item').value = itemName;
-      document.getElementById('reserver-name').value = '';
+      document.getElementById('reserver-name').value = ''; // Efface le champ nom
     }
 
     function closeModal() {
       document.getElementById('modal').classList.add('hidden');
     }
+
+    function confirmCancelReservation(articleName, reservedBy) {
+      const userNameInput = prompt(`Pour annuler la réservation de "${articleName}", veuillez entrer le nom avec lequel vous avez réservé l'article (actuellement "${reservedBy}") :`);
+      if (userNameInput === reservedBy) {
+        // En théorie, on devrait aussi envoyer une requête au script pour supprimer la ligne
+        // Pour l'instant, on se contente de la supprimer localement pour le "vrai" annuler.
+        // Si la logique de suppression est ajoutée au Google Sheet, le loadReservationsAndRender() mettra à jour.
+        showToast("L'annulation via le web n'est pas encore implémentée pour le Google Sheet. Veuillez contacter l'administrateur si nécessaire.", true);
+        delete currentReservations[articleName]; // Supprime localement pour la démo
+        renderArticles();
+      } else if (userNameInput !== null) { // Si l'utilisateur n'a pas annulé la boîte de dialogue
+        showToast("Nom incorrect. Annulation non effectuée.", true);
+      }
+    }
+
 
     async function submitReservation(e) {
       e.preventDefault();
@@ -144,13 +172,9 @@
         return;
       }
 
-      // Sauvegarder localement d'abord
-      setReservation(article, name);
-      closeModal();
-      renderArticles();
-      showToast('Réservation enregistrée !');
+      closeModal(); // Ferme la modale immédiatement
+      showToast('Envoi de la réservation...', false);
 
-      // Essayer d'envoyer vers Google Sheet
       try {
         const response = await fetch(SHEET_URL, {
           method: "POST",
@@ -170,22 +194,29 @@
 
         const result = await response.json();
         if (result.success) {
-          console.log('Données sauvegardées sur Google Sheets');
+          showToast('Réservation effectuée avec succès !', false);
+          loadReservationsAndRender(); // Recharge les réservations pour refléter le changement
         } else {
-          console.warn('Erreur lors de la sauvegarde:', result.error);
+          showToast(`Erreur: ${result.error || "Une erreur inconnue est survenue."}`, true);
+          loadReservationsAndRender(); // Recharge même en cas d'erreur pour obtenir l'état actuel du sheet
         }
       } catch (err) {
-        console.warn("Erreur d'enregistrement distant:", err);
-        // La réservation reste active localement même si l'envoi échoue
+        console.error("Erreur lors de l'envoi de la réservation:", err);
+        showToast("Erreur de connexion. Impossible de réserver.", true);
+        loadReservationsAndRender(); // Tente de recharger pour avoir l'état le plus juste
       }
     }
 
-    // Permettre d'appuyer sur Entrée dans le champ mot de passe
+    // --- Écouteurs d'événements ---
     document.getElementById('password').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         checkPassword();
       }
     });
-  </script>
+
+    // Charger les réservations dès que le DOM est prêt (après authentification)
+    // Ce n'est plus nécessaire ici car `loadReservationsAndRender()` est appelé après `checkPassword`.
+    // Si vous retiriez l'authentification, il faudrait l'appeler au chargement du DOM.
+</script>
 </body>
 </html>
