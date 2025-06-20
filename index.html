@@ -19,8 +19,47 @@
 
   <!-- Content -->
   <div id="content" class="hidden w-full max-w-6xl space-y-6">
-    <h1 class="text-3xl font-bold text-center text-indigo-700 mt-6">Liste de naissance 👶</h1>
-    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="article-grid"></div>
+    <div id="top-section" class="text-center mb-8">
+  <div class="flex justify-center items-center mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart text-pink-500 mr-2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-baby text-blue-500 mx-2"><path d="M9 12h.01"></path><path d="M15 12h.01"></path><path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"></path><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart text-pink-500 ml-2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg></div>
+
+  <h1 class="text-4xl font-bold text-gray-800 mb-6">Liste de Naissance</h1>
+
+  <!-- Carte Orchestra -->
+  <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-6 rounded-lg shadow-lg mb-6 max-w-4xl mx-auto">
+    <div class="flex items-center justify-center mb-3">
+     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-store mr-2"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path><path d="M2 7h20"></path><path d="M22 7v3a2 2 0 0 1-2 2v0a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12v0a2 2 0 0 1-2-2V7"></path></svg>
+      <span class="text-xl font-bold">CHEZ ORCHESTRA</span>
+    </div>
+    <p class="mb-3 text-sm">Permet de cumuler des € pour un bon d'achat à la fin !</p>
+
+    <div class="bg-white/20 backdrop-blur-sm rounded-lg p-4 mb-3">
+      <p class="font-semibold mb-2">🌐 En ligne :</p>
+      <a href="https://listedenaissance..." target="_blank" rel="noopener noreferrer" class="text-white underline hover:text-pink-200 transition-colors text-sm break-all">
+        Accéder à la liste Orchestra
+      </a>
+    </div>
+
+    <div class="bg-white/20 backdrop-blur-sm rounded-lg p-4">
+      <p class="font-semibold mb-1">🏪 En magasin :</p>
+      <p class="font-mono text-lg">Liste N° 66GR-FR066-CIDU-17405847265999</p>
+    </div>
+  </div>
+
+  <!-- Progression -->
+  <div class="bg-white rounded-lg shadow-md p-6 max-w-md mx-auto">
+    <div class="flex items-center justify-center mb-3">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gift text-green-500 mr-2"><rect x="3" y="8" width="18" height="4" rx="1"></rect><path d="M12 8v13"></path><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"></path></svg>
+      <span class="text-lg font-semibold">Progression</span>
+    </div>
+    <div class="bg-gray-200 rounded-full h-3 mb-2">
+      <div id="progress-bar" class="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full transition-all duration-500" style="width: 0%;"></div>
+    </div>
+    <p id="progress-text" class="text-sm text-gray-600">0 sur 0 articles réservés</p>
+  </div>
+</div>
+   
+<div class="grid grid-cols-1 gap-6" id="article-grid"></div>
+    <div class="text-center mt-12 text-gray-500"><p>Merci pour votre générosité ! 💕</p><p class="text-sm mt-2">Cette liste sera mise à jour en temps réel</p></div>
   </div>
 
   <!-- Modal -->
@@ -59,15 +98,56 @@
     const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const articles = [
-      { name: "Chaise haute Sweety Fox", url: "https://www.amazon.fr/dp/B07FDRX1XN" },
-      { name: "Langes Orchestra", url: "https://fr.shop-orchestra.com/fr/puericulture/repas/bavoir-et-lange/lange/lot-de-6-langes-en-coton-70-x-70-cm-PBRIA2.html" },
-      { name: "Cube en bois Vertbaudet", url: "https://www.vertbaudet.fr/grand-cube-d-activites-en-bois-fsc-tanzanie.htm" },
-      { name: "Arche d'éveil", url: "https://www.madeinbebe.com/boutique/fr/arche-deveil-promenons-nous-sauthon-baby-deco-385798/a385798" },
-      { name: "Bol ventouse Done by Deer", url: "https://donebydeer.com/fr-fr/products/stick-stay-dinner-set-lalee-colour-mix" },
-      { name: "Cape de bain Breizh Club", url: "https://www.breizhclub.bzh/accessoires-bebe-et-enfant/1782-cape-de-bain-mariniere-petite-bretonne.html" },
-      { name: "Soin Rebozo - Saint-Avé", url: "https://www.unedoulapourunevie.com/rebozo-vannes-morbihan" },
-      { name: "Soin Rebozo - à domicile", url: "https://www.infinibiennaitre.fr/soin-rebozo-fermeture-postnatal" }
-    ];
+  {
+    name: "Chaise haute Sweety Fox",
+    url: "https://www.amazon.fr/dp/B07FDRX1XN",
+    image: "https://lorempicture.point-sys.com/400/300/",
+     category: "Éveil",
+      preferer: "true", // facultatif
+    subcategory: "Tapis de jeux/éveil pliable & lavable"
+  },
+  {
+    name: "Langes Orchestra",
+    url: "https://fr.shop-orchestra.com/fr/puericulture/repas/bavoir-et-lange/lange/lot-de-6-langes-en-coton-70-x-70-cm-PBRIA2.html",
+    image: "https://lorempicture.point-sys.com/400/300/",
+    
+  },
+  {
+    name: "Cube en bois Vertbaudet",
+    url: "https://www.vertbaudet.fr/grand-cube-d-activites-en-bois-fsc-tanzanie.htm",
+    image: "https://lorempicture.point-sys.com/400/300/",
+     category: "Éveil",
+    subcategory: "Tapis de jeux/éveil pliable & lavable"
+  },
+  {
+    name: "Arche d'éveil",
+    url: "https://www.madeinbebe.com/boutique/fr/arche-deveil-promenons-nous-sauthon-baby-deco-385798/a385798",
+    image: "https://lorempicture.point-sys.com/400/300/"
+  },
+  {
+    name: "Bol ventouse Done by Deer",
+    url: "https://donebydeer.com/fr-fr/products/stick-stay-dinner-set-lalee-colour-mix",
+    image: "https://lorempicture.point-sys.com/400/300/",
+     category: "Éveil",
+    subcategory: "Tapis de jeux/éveil pliable & lavable"
+  },
+  {
+    name: "Cape de bain Breizh Club",
+    url: "https://www.breizhclub.bzh/accessoires-bebe-et-enfant/1782-cape-de-bain-mariniere-petite-bretonne.html",
+    image: "https://lorempicture.point-sys.com/400/300/"
+  },
+  {
+    name: "Soin Rebozo - Saint-Avé",
+    url: "https://www.unedoulapourunevie.com/rebozo-vannes-morbihan",
+    image: "https://lorempicture.point-sys.com/400/300/"
+  },
+  {
+    name: "Soin Rebozo - à domicile",
+    url: "https://www.infinibiennaitre.fr/soin-rebozo-fermeture-postnatal",
+    image: "https://lorempicture.point-sys.com/400/300/"
+  }
+];
+
 
     let currentReservations = {};
 
@@ -91,26 +171,121 @@
       renderArticles();
     }
 
-    function renderArticles() {
-      const grid = document.getElementById("article-grid");
-      grid.innerHTML = "";
-      articles.forEach(article => {
-        const res = currentReservations[article.name];
-        const div = document.createElement("div");
-        div.className = "bg-white p-4 rounded-xl shadow";
-        div.innerHTML = `
-          <h2 class="text-lg font-bold text-indigo-700 mb-1">${article.name}</h2>
-          <a href="${article.url}" target="_blank" class="text-blue-600 underline text-sm">Voir l'article</a>
-          ${res ? `
-            <p class="mt-3 text-sm text-gray-700">Réservé par : <span class="font-semibold">${res.name}</span></p>
-            <button onclick="confirmCancelReservation('${article.name}')" class="mt-2 bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600">Annuler ma réservation</button>
+ function renderArticles() {
+  const container = document.getElementById('article-grid');
+  container.innerHTML = '';
+
+  const grouped = {};
+
+  // Grouper les articles par catégorie > sous-catégorie
+  articles.forEach(article => {
+    const category = article.category || 'Suggestion du chef';
+    const subcategory = article.subcategory || '';
+
+    if (!grouped[category]) grouped[category] = {};
+    if (!grouped[category][subcategory]) grouped[category][subcategory] = [];
+    grouped[category][subcategory].push(article);
+  });
+
+  // Construction du HTML
+  Object.entries(grouped).forEach(([category, subcategories]) => {
+    const categoryWrapper = document.createElement('div');
+    categoryWrapper.className = "mb-8";
+
+    // Titre de catégorie
+    const categoryTitle = document.createElement('h2');
+    categoryTitle.className = "text-2xl font-bold text-gray-800 mb-6 flex items-center";
+    categoryTitle.innerHTML = `<div class="w-1 h-8 bg-gradient-to-b from-pink-500 to-blue-500 mr-3 rounded"></div>${category}`;
+    categoryWrapper.appendChild(categoryTitle);
+
+    Object.entries(subcategories).forEach(([subcategory, articlesList]) => {
+      const subWrapper = document.createElement('div');
+      subWrapper.className = "mb-6";
+
+      // Titre de sous-catégorie (si elle existe seulement)
+      if (subcategory.trim() !== '') {
+        const subTitle = document.createElement('h3');
+        subTitle.className = "text-lg font-semibold text-gray-700 mb-3 pl-4 border-l-2 border-pink-300";
+        subTitle.textContent = subcategory;
+        subWrapper.appendChild(subTitle);
+      }
+
+      // Grille d’articles
+      const grid = document.createElement('div');
+      grid.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4";
+
+      articlesList.forEach(article => {
+        const reservedBy = currentReservations[article.name];
+        const articleDiv = document.createElement('div');
+        articleDiv.className = "bg-white rounded-lg shadow-md p-4 transition-all duration-300 hover:shadow-lg border-l-4 border-gray-200 hover:border-pink-300 flex flex-col";
+
+        const brandBadge = article.brand === 'Orchestra'
+          ? `<span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full mb-2">🎵 Orchestra</span>`
+          : '';
+
+        const imageHTML = article.image
+          ? `<img src="${article.image}" alt="${article.name}" class="w-full h-48 object-cover rounded mb-4">`
+          : '';
+
+        const linkHTML = article.url
+          ? `<a href="${article.url}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:text-blue-700 transition-colors" title="Voir le produit">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-external-link">
+                <path d="M15 3h6v6"></path>
+                <path d="M10 14 21 3"></path>
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              </svg>
+            </a>`
+          : '';
+
+        articleDiv.innerHTML = `
+          ${imageHTML}
+          <div class="flex justify-between items-start mb-3">
+            <div class="flex-1">
+              ${brandBadge}
+              <h4 class="font-medium text-gray-800 text-sm leading-tight">${article.name}</h4>
+            </div>
+            <div class="flex items-center ml-2 space-x-2">
+              ${linkHTML}
+            </div>
+          </div>
+
+          ${reservedBy ? `
+            <p class="text-sm text-gray-600 mb-2">Réservé par : <span class="font-semibold">${reservedBy}</span></p>
+            <button onclick="confirmCancelReservation('${article.name}', '${reservedBy}')" class="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-2 px-3 rounded-lg hover:from-red-500 hover:to-pink-600 transition-all duration-300 font-medium text-sm">Annuler ma réservation</button>
           ` : `
-            <button onclick="openModal('${article.name}')" class="mt-3 bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">Je réserve</button>
+            <button onclick="openModal('${article.name}')" class="w-full mt-auto bg-gradient-to-r from-pink-500 to-blue-500 text-white py-2 px-3 rounded-lg hover:from-pink-600 hover:to-blue-600 transition-all duration-300 font-medium text-sm">Réserver</button>
           `}
         `;
-        grid.appendChild(div);
+
+        grid.appendChild(articleDiv);
       });
-    }
+
+      subWrapper.appendChild(grid);
+      categoryWrapper.appendChild(subWrapper);
+    });
+
+    container.appendChild(categoryWrapper);
+  });
+
+  updateProgressBar();
+}
+
+
+
+function updateProgressBar() {
+  const total = articles.length;
+  const reserved = Object.keys(currentReservations).length;
+
+  const percent = Math.round((reserved / total) * 100);
+  const bar = document.getElementById('progress-bar');
+  const text = document.getElementById('progress-text');
+
+  if (bar) bar.style.width = `${percent}%`;
+  if (text) text.textContent = `${reserved} sur ${total} articles réservés`;
+}
+
 
     function openModal(item) {
       document.getElementById("modal").classList.remove("hidden");
