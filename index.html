@@ -35,6 +35,17 @@
       </form>
     </div>
   </div>
+  <!-- Confirmation Modal -->
+<div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full text-center">
+    <h2 class="text-2xl font-bold text-green-600 mb-4">Réservation réussie 🎉</h2>
+    <p class="text-gray-700 mb-4">Voici votre code d'annulation :</p>
+    <div class="text-xl font-mono bg-gray-100 px-4 py-2 rounded mb-4" id="confirmation-code">XXXXXX</div>
+    <p class="text-sm text-gray-500 mb-4">Gardez-le précieusement, il vous permettra d'annuler votre réservation.</p>
+    <button onclick="closeConfirmationModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">Fermer</button>
+  </div>
+</div>
+
 
   <!-- Toast -->
   <div id="toast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg hidden">
@@ -138,8 +149,9 @@
         console.error(error);
         showToast("Erreur de réservation", true);
       } else {
-        showToast(`Réservé avec succès !\nCode : ${password}`);
-        loadReservations();
+        showConfirmationModal(password);
+loadReservations();
+
       }
     }
 
@@ -172,6 +184,16 @@
     document.getElementById('password').addEventListener('keypress', e => {
       if (e.key === 'Enter') checkPassword();
     });
+
+    function showConfirmationModal(code) {
+  document.getElementById("confirmation-code").textContent = code;
+  document.getElementById("confirmation-modal").classList.remove("hidden");
+}
+
+function closeConfirmationModal() {
+  document.getElementById("confirmation-modal").classList.add("hidden");
+}
+
   </script>
 </body>
 </html>
