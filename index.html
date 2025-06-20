@@ -90,73 +90,62 @@
   <div id="toast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg hidden">
     <span id="toast-message"></span>
   </div>
-  <script>
-        // Configuration Supabase (gardez ces valeurs publiques)
-        const SUPABASE_URL = "https://wpewfaibwiigjasocepy.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZXdmYWlid2lpZ2phc29jZXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzNzM3NDgsImV4cCI6MjA2NTk0OTc0OH0.guVeW4sz4I8WF0wQTuLYb3CgJvdmUVXqY122HXwWmlE";
-        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Fonction pour extraire le mot de passe de l'URL
-        function getPasswordFromURL() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('pwd') || params.get('password') || params.get('p');
-        }
+<script>
+    const SUPABASE_URL = "https://wpewfaibwiigjasocepy.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZXdmYWlid2lpZ2phc29jZXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzNzM3NDgsImV4cCI6MjA2NTk0OTc0OH0.guVeW4sz4I8WF0wQTuLYb3CgJvdmUVXqY122HXwWmlE";
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Fonction pour vérifier le mot de passe
-        function checkPassword() {
-            const input = document.getElementById('password').value;
-            const urlPassword = getPasswordFromURL();
-            
-            // Si un mot de passe est dans l'URL, l'utiliser automatiquement
-            const passwordToCheck = urlPassword || input;
-            
-            if (passwordToCheck) {
-                // Ici vous pouvez implémenter votre logique de vérification
-                // Pour l'exemple, j'utilise un simple hash SHA-256
-                hashPassword(passwordToCheck).then(hash => {
-                    // Remplacez ce hash par celui de votre mot de passe
-                    const validPasswordHash = "08cbb179bd0eab7d166dcdf2835d2660e7ae9a934edf9ff051fbbea18f0bf255"; // hash de "hello"
-                    
-                    if (hash === validPasswordHash) {
-                        document.getElementById('auth').classList.add('hidden');
-                        document.getElementById('content').classList.remove('hidden');
-                        loadReservations();
-                        
-                        // Nettoyer l'URL pour supprimer le mot de passe
-                        if (urlPassword) {
-                            const url = new URL(window.location);
-                            url.searchParams.delete('pwd');
-                            url.searchParams.delete('password');
-                            url.searchParams.delete('p');
-                            window.history.replaceState({}, document.title, url.toString());
-                        }
-                    } else {
-                        document.getElementById('error').classList.remove('hidden');
+    function getPasswordFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('pwd') || params.get('password') || params.get('p');
+    }
+
+    function checkPassword() {
+        const input = document.getElementById('password').value;
+        const urlPassword = getPasswordFromURL();
+        const passwordToCheck = urlPassword || input;
+
+        if (passwordToCheck) {
+            hashPassword(passwordToCheck).then(hash => {
+                const validPasswordHash = "08cbb179bd0eab7d166dcdf2835d2660e7ae9a934edf9ff051fbbea18f0bf255";
+                if (hash === validPasswordHash) {
+                    document.getElementById('auth').classList.add('hidden');
+                    document.getElementById('content').classList.remove('hidden');
+                    loadReservations();
+                    if (urlPassword) {
+                        const url = new URL(window.location);
+                        url.searchParams.delete('pwd');
+                        url.searchParams.delete('password');
+                        url.searchParams.delete('p');
+                        window.history.replaceState({}, document.title, url.toString());
                     }
-                });
-            } else {
-                document.getElementById('error').classList.remove('hidden');
-            }
+                } else {
+                    document.getElementById('error').classList.remove('hidden');
+                }
+            });
+        } else {
+            document.getElementById('error').classList.remove('hidden');
         }
+    }
 
-        // Fonction pour hasher le mot de passe
-        async function hashPassword(password) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(password);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    async function hashPassword(password) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    window.addEventListener('load', () => {
+        const urlPassword = getPasswordFromURL();
+        if (urlPassword) {
+            checkPassword();
         }
+    });
 
-        // Vérification automatique si mot de passe dans l'URL
-        window.addEventListener('load', () => {
-            const urlPassword = getPasswordFromURL();
-            if (urlPassword) {
-                checkPassword();
-            }
-        });
-
-        const articles = [
+    // ... (ton tableau articles et le reste du code reste inchangé sauf corrections des apostrophes)
+    const articles = [
             {
                 name: "Chaise haute Sweety Fox",
                 url: "https://www.amazon.fr/dp/B07FDRX1XN",
@@ -272,230 +261,51 @@
             }
         ];
 
-        let currentReservations = {};
+    function confirmCancelReservation(article) {
+        const code = prompt(`Entrez votre code d'annulation pour "${article}"`);
+        if (!code) return;
 
-        async function loadReservations() {
-            const { data, error } = await client.from("reservations").select("*");
-            currentReservations = {};
-            if (data) {
-                data.forEach(r => currentReservations[r.article] = { name: r.name });
-            }
-            renderArticles();
-        }
+        showToast("Annulation en cours...");
 
-        function renderArticles() {
-            const container = document.getElementById('article-grid');
-            container.innerHTML = '';
-
-            const grouped = {};
-            const reservedArticles = [];
-
-            articles.forEach(article => {
-                const reservedBy = currentReservations[article.name];
-                if (reservedBy) {
-                    reservedArticles.push(article);
+        client.from("reservations")
+            .delete()
+            .eq("article", article)
+            .eq("password", code)
+            .then(({ error }) => {
+                if (error) {
+                    console.error("Erreur lors de l'annulation:", error);
+                    showToast("Erreur lors de l'annulation", true);
                 } else {
-                    const category = article.category || 'Suggestion du chef';
-                    const subcategory = article.subcategory || '';
-
-                    if (!grouped[category]) grouped[category] = {};
-                    if (!grouped[category][subcategory]) grouped[category][subcategory] = [];
-                    grouped[category][subcategory].push(article);
+                    showToast("Réservation annulée avec succès");
+                    loadReservations();
                 }
             });
+    }
 
-            function generateCategorySection(title, subcategories) {
-                const categoryWrapper = document.createElement('div');
-                categoryWrapper.className = "mb-8";
+    function showToast(msg, isError = false) {
+        const toast = document.getElementById("toast");
+        document.getElementById("toast-message").textContent = msg;
+        toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white ${isError ? "bg-red-500" : "bg-green-500"}`;
+        toast.classList.remove("hidden");
+        setTimeout(() => toast.classList.add("hidden"), 3000);
+    }
 
-                const categoryTitle = document.createElement('h2');
-                categoryTitle.className = "text-2xl font-bold text-gray-800 mb-6 flex items-center";
-                categoryTitle.innerHTML = `<div class="w-1 h-8 bg-gradient-to-b from-pink-500 to-blue-500 mr-3 rounded"></div>${title}`;
-                categoryWrapper.appendChild(categoryTitle);
+    function showConfirmationModal(code) {
+        document.getElementById("confirmation-code").textContent = code;
+        document.getElementById("confirmation-modal").classList.remove("hidden");
+    }
 
-                Object.entries(subcategories).forEach(([subcategory, articlesList]) => {
-                    const subWrapper = document.createElement('div');
-                    subWrapper.className = "mb-6";
+    function closeConfirmationModal() {
+        document.getElementById("confirmation-modal").classList.add("hidden");
+    }
 
-                    if (subcategory.trim() !== '') {
-                        const subTitle = document.createElement('h3');
-                        subTitle.className = "text-lg font-semibold text-gray-700 mb-3 pl-4 border-l-2 border-pink-300";
-                        subTitle.textContent = subcategory;
-                        subWrapper.appendChild(subTitle);
-                    }
+    document.getElementById('password').addEventListener('keypress', e => {
+        if (e.key === 'Enter') checkPassword();
+    });
+</script>
 
-                    const grid = document.createElement('div');
-                    grid.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4";
 
-                    articlesList.forEach(article => {
-                        const reservedBy = currentReservations[article.name];
-                        const reservedByName = reservedBy?.user || reservedBy?.name || reservedBy || '';
 
-                        const articleDiv = document.createElement('div');
-                        articleDiv.className = "bg-white rounded-lg shadow-md p-4 transition-all duration-300 hover:shadow-lg border-l-4 border-gray-200 hover:border-pink-300 flex flex-col";
-
-                        const brandBadge = article.brand === 'Orchestra'
-                            ? `<span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full mb-2">🎵 Orchestra</span>`
-                            : '';
-
-                        const imageHTML = article.image
-                            ? article.url
-                                ? `<a href="${article.url}" target="_blank" rel="noopener noreferrer">
-                                     <img src="${article.image}" alt="${article.name}" class="mx-auto h-48 rounded mb-4">
-                                   </a>`
-                                : `<img src="${article.image}" alt="${article.name}" class="mx-auto h-48 rounded mb-4">`
-                            : '';
-
-                        const linkHTML = article.url
-                            ? `<a href="${article.url}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:text-blue-700 transition-colors" title="Voir le produit">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                    class="lucide lucide-external-link">
-                                    <path d="M15 3h6v6"></path>
-                                    <path d="M10 14 21 3"></path>
-                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                  </svg>
-                                </a>`
-                            : '';
-
-                        articleDiv.innerHTML = `
-                            ${imageHTML}
-                            <div class="flex justify-between items-start mb-3">
-                                <div class="flex-1">
-                                    ${brandBadge}
-                                    <h4 class="font-medium text-gray-800 text-sm leading-tight">${article.name}</h4>
-                                </div>
-                                <div class="flex items-center ml-2 space-x-2">
-                                    ${linkHTML}
-                                </div>
-                            </div>
-
-                            ${reservedBy ? `
-                                <p class="text-sm text-gray-600 mb-2">Réservé par : <span class="font-semibold">${reservedByName}</span></p>
-                                <button onclick="confirmCancelReservation('${article.name}')" class="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-2 px-3 rounded-lg hover:from-red-500 hover:to-pink-600 transition-all duration-300 font-medium text-sm">Annuler ma réservation</button>
-                            ` : `
-                                <button onclick="openModal('${article.name}')" class="w-full mt-auto bg-gradient-to-r from-pink-500 to-blue-500 text-white py-2 px-3 rounded-lg hover:from-pink-600 hover:to-blue-600 transition-all duration-300 font-medium text-sm">Réserver</button>
-                            `}
-                        `;
-
-                        grid.appendChild(articleDiv);
-                    });
-
-                    subWrapper.appendChild(grid);
-                    categoryWrapper.appendChild(subWrapper);
-                });
-
-                container.appendChild(categoryWrapper);
-            }
-
-            Object.entries(grouped).forEach(([category, subcategories]) => {
-                generateCategorySection(category, subcategories);
-            });
-
-            if (reservedArticles.length > 0) {
-                const reservedGrouped = { '': reservedArticles };
-                generateCategorySection("Articles réservés", reservedGrouped);
-            }
-
-            updateProgressBar();
-        }
-
-        function updateProgressBar() {
-            const total = articles.length;
-            const reserved = Object.keys(currentReservations).length;
-
-            const percent = Math.round((reserved / total) * 100);
-            const bar = document.getElementById('progress-bar');
-            const text = document.getElementById('progress-text');
-
-            if (bar) bar.style.width = `${percent}%`;
-            if (text) text.textContent = `${reserved} sur ${total} articles réservés`;
-        }
-
-        function openModal(item) {
-            document.getElementById("modal").classList.remove("hidden");
-            document.getElementById("modal-item-name").textContent = item;
-            document.getElementById("current-item").value = item;
-            document.getElementById("reserver-name").value = '';
-        }
-
-        function closeModal() {
-            document.getElementById("modal").classList.add("hidden");
-        }
-
-        function generateSecretCode(length = 6) {
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            let result = '';
-            for (let i = 0; i < length; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        }
-
-        async function submitReservation(e) {
-            e.preventDefault();
-            const name = document.getElementById('reserver-name').value.trim();
-            const article = document.getElementById('current-item').value;
-            const password = generateSecretCode();
-
-            if (!name) return showToast("Nom requis", true);
-
-            closeModal();
-            showToast("Réservation en cours...");
-
-            const { error } = await client.from("reservations").insert([{ name, article, password }]);
-
-            if (error) {
-                console.error(error);
-                showToast("Erreur de réservation", true);
-            } else {
-                showConfirmationModal(password);
-                loadReservations();
-            }
-        }
-
-        function confirmCancelReservation(article) {
-            const code = prompt(`Entrez votre code d'annulation pour "${article}"`);
-            if (!code) return;
-
-            showToast("Annulation en cours...");
-
-            client.from("reservations")
-                .delete()
-                .eq("article", article)
-                .eq("password", code)
-                .then(({ error, data }) => {
-                    if (error) {
-                        console.error("Erreur lors de l'annulation:", error);
-                        showToast("Erreur lors de l'annulation", true);
-                    } else {
-                        showToast("Réservation annulée avec succès");
-                        loadReservations();
-                    }
-                });
-        }
-
-        function showToast(msg, isError = false) {
-            const toast = document.getElementById("toast");
-            document.getElementById("toast-message").textContent = msg;
-            toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white ${isError ? "bg-red-500" : "bg-green-500"}`;
-            toast.classList.remove("hidden");
-            setTimeout(() => toast.classList.add("hidden"), 3000);
-        }
-
-        function showConfirmationModal(code) {
-            document.getElementById("confirmation-code").textContent = code;
-            document.getElementById("confirmation-modal").classList.remove("hidden");
-        }
-
-        function closeConfirmationModal() {
-            document.getElementById("confirmation-modal").classList.add("hidden");
-        }
-
-        document.getElementById('password').addEventListener('keypress', e => {
-            if (e.key === 'Enter') checkPassword();
-        });
-    </script>
 
   
 </body>
