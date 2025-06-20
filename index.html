@@ -45,8 +45,7 @@
   <script>
     const SUPABASE_URL = "https://wpewfaibwiigjasocepy.supabase.co"; // 🔁 Remplace par ton URL Supabase
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZXdmYWlid2lpZ2phc29jZXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzNzM3NDgsImV4cCI6MjA2NTk0OTc0OH0.guVeW4sz4I8WF0wQTuLYb3CgJvdmUVXqY122HXwWmlE"; // 🔁 Remplace par ta clé publique "anon"
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let currentReservations = {};
 
     const articles = [
@@ -72,7 +71,7 @@
     }
 
     async function loadReservations() {
-      const { data, error } = await supabase.from("reservations").select("*");
+      const { data, error } = await client.from("reservations").select("*");
       if (error) {
         showToast("Erreur de chargement", true);
         return;
@@ -135,7 +134,7 @@
       closeModal();
       showToast("Réservation en cours...");
 
-      const { error } = await supabase.from("reservations").insert([{ name, article }]);
+      const { error } = await client.from("reservations").insert([{ name, article }]);
 
       if (error) {
         console.error(error);
