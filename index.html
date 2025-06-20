@@ -372,9 +372,9 @@
 
                             ${reservedBy ? `
                                 <p class="text-sm text-gray-600 mb-2">Réservé par : <span class="font-semibold">${reservedByName}</span></p>
-                                <button onclick="confirmCancelReservation('${article.name}')" class="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-2 px-3 rounded-lg hover:from-red-500 hover:to-pink-600 transition-all duration-300 font-medium text-sm">Annuler ma réservation</button>
+                                <button onclick="confirmCancelReservation(${JSON.stringify(article.name)})" class="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-2 px-3 rounded-lg hover:from-red-500 hover:to-pink-600 transition-all duration-300 font-medium text-sm">Annuler ma réservation</button>
                             ` : `
-                                <button onclick="openModal('${article.name}')" class="w-full mt-auto bg-gradient-to-r from-pink-500 to-blue-500 text-white py-2 px-3 rounded-lg hover:from-pink-600 hover:to-blue-600 transition-all duration-300 font-medium text-sm">Réserver</button>
+                                <button onclick="openModal(${JSON.stringify(article.name)})" class="w-full mt-auto bg-gradient-to-r from-pink-500 to-blue-500 text-white py-2 px-3 rounded-lg hover:from-pink-600 hover:to-blue-600 transition-all duration-300 font-medium text-sm">Réserver</button>
                             `}
                         `;
 
