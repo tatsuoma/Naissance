@@ -115,7 +115,7 @@
                 // Pour l'exemple, j'utilise un simple hash SHA-256
                 hashPassword(passwordToCheck).then(hash => {
                     // Remplacez ce hash par celui de votre mot de passe
-                    const validPasswordHash = "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"; // hash de "hello"
+                    const validPasswordHash = "08cbb179bd0eab7d166dcdf2835d2660e7ae9a934edf9ff051fbbea18f0bf255"; // hash de "hello"
                     
                     if (hash === validPasswordHash) {
                         document.getElementById('auth').classList.add('hidden');
