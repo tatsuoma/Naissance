@@ -43,12 +43,13 @@
   </div>
 
   <script>
+        const PASSWORD = "mdptest2"; // ← utilisé uniquement côté client
+
     // Config Supabase
     const SUPABASE_URL = "https://wpewfaibwiigjasocepy.supabase.co"; // ← à remplacer
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZXdmYWlid2lpZ2phc29jZXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzNzM3NDgsImV4cCI6MjA2NTk0OTc0OH0.guVeW4sz4I8WF0wQTuLYb3CgJvdmUVXqY122HXwWmlE"; // ← à remplacer
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const PASSWORD = "mdptest2"; // ← utilisé uniquement côté client
     const articles = [
        { name: "Chaise haute Sweety Fox", url: "https://www.amazon.fr/dp/B07FDRX1XN" },
       { name: "Langes Orchestra", url: "https://fr.shop-orchestra.com/fr/puericulture/repas/bavoir-et-lange/lange/lot-de-6-langes-en-coton-70-x-70-cm-PBRIA2.html" },
