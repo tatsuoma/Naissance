@@ -216,6 +216,8 @@
 
       articlesList.forEach(article => {
         const reservedBy = currentReservations[article.name];
+        const reservedByName = reservedBy?.user || reservedBy?.name || reservedBy || '';
+
         const articleDiv = document.createElement('div');
         articleDiv.className = "bg-white rounded-lg shadow-md p-4 transition-all duration-300 hover:shadow-lg border-l-4 border-gray-200 hover:border-pink-300 flex flex-col";
 
@@ -252,7 +254,7 @@
           </div>
 
           ${reservedBy ? `
-            <p class="text-sm text-gray-600 mb-2">Réservé par : <span class="font-semibold">${reservedBy}</span></p>
+            <p class="text-sm text-gray-600 mb-2">Réservé par : <span class="font-semibold">${reservedByName}</span></p>
             <button onclick="confirmCancelReservation('${article.name}', '${reservedBy}')" class="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-2 px-3 rounded-lg hover:from-red-500 hover:to-pink-600 transition-all duration-300 font-medium text-sm">Annuler ma réservation</button>
           ` : `
             <button onclick="openModal('${article.name}')" class="w-full mt-auto bg-gradient-to-r from-pink-500 to-blue-500 text-white py-2 px-3 rounded-lg hover:from-pink-600 hover:to-blue-600 transition-all duration-300 font-medium text-sm">Réserver</button>
