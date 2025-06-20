@@ -115,7 +115,7 @@
                 // Pour l'exemple, j'utilise un simple hash SHA-256
                 hashPassword(passwordToCheck).then(hash => {
                     // Remplacez ce hash par celui de votre mot de passe
-                    const validPasswordHash = "08cbb179bd0eab7d166dcdf2835d2660e7ae9a934edf9ff051fbbea18f0bf255"; // hash de "hello"
+                    const validPasswordHash = "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"; // hash de "hello"
                     
                     if (hash === validPasswordHash) {
                         document.getElementById('auth').classList.add('hidden');
@@ -372,9 +372,9 @@
 
                             ${reservedBy ? `
                                 <p class="text-sm text-gray-600 mb-2">Réservé par : <span class="font-semibold">${reservedByName}</span></p>
-                                <button onclick="confirmCancelReservation(${JSON.stringify(article.name)})" class="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-2 px-3 rounded-lg hover:from-red-500 hover:to-pink-600 transition-all duration-300 font-medium text-sm">Annuler ma réservation</button>
+                                <button onclick="confirmCancelReservation('${article.name}')" class="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-2 px-3 rounded-lg hover:from-red-500 hover:to-pink-600 transition-all duration-300 font-medium text-sm">Annuler ma réservation</button>
                             ` : `
-                                <button onclick="openModal(${JSON.stringify(article.name)})" class="w-full mt-auto bg-gradient-to-r from-pink-500 to-blue-500 text-white py-2 px-3 rounded-lg hover:from-pink-600 hover:to-blue-600 transition-all duration-300 font-medium text-sm">Réserver</button>
+                                <button onclick="openModal('${article.name}')" class="w-full mt-auto bg-gradient-to-r from-pink-500 to-blue-500 text-white py-2 px-3 rounded-lg hover:from-pink-600 hover:to-blue-600 transition-all duration-300 font-medium text-sm">Réserver</button>
                             `}
                         `;
 
