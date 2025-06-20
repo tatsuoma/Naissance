@@ -9,7 +9,7 @@
 </head>
 <body class="bg-gradient-to-br from-indigo-100 via-purple-100 to-blue-100 min-h-screen flex flex-col items-center p-4 font-sans">
 
-  <!-- Authentification -->
+  <!-- Auth Section -->
   <div id="auth" class="bg-white rounded-2xl shadow-xl p-6 max-w-md w-full mt-20">
     <h1 class="text-xl font-semibold mb-4 text-center">Accès à la liste</h1>
     <input id="password" type="password" placeholder="Mot de passe" class="border p-2 w-full rounded mb-4" />
@@ -17,7 +17,7 @@
     <p id="error" class="text-red-500 text-sm mt-2 hidden">Mot de passe incorrect</p>
   </div>
 
-  <!-- Contenu -->
+  <!-- Content Section -->
   <div id="content" class="hidden w-full max-w-6xl space-y-6">
     <h1 class="text-3xl font-bold text-center text-indigo-700 mt-6">Liste de naissance 👶</h1>
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="article-grid"></div>
@@ -29,7 +29,6 @@
       <h2 class="text-xl font-semibold text-indigo-600 mb-4">Réserver <span id="modal-item-name"></span></h2>
       <form onsubmit="submitReservation(event)">
         <input type="text" id="reserver-name" placeholder="Nom Prénom" required class="border p-2 w-full mb-4 rounded" />
-        <input type="password" id="reserver-password" placeholder="Mot de passe (privé)" required class="border p-2 w-full mb-4 rounded" />
         <input type="hidden" id="current-item" />
         <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded w-full">Confirmer</button>
         <button type="button" onclick="closeModal()" class="mt-2 text-sm text-gray-600 w-full">Annuler</button>
@@ -42,59 +41,61 @@
     <span id="toast-message"></span>
   </div>
 
+  <!-- Script -->
   <script>
-        const PASSWORD = "mdptest2"; // ← utilisé uniquement côté client
-
-    // Config Supabase
-    const SUPABASE_URL = "https://wpewfaibwiigjasocepy.supabase.co"; // ← à remplacer
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZXdmYWlid2lpZ2phc29jZXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzNzM3NDgsImV4cCI6MjA2NTk0OTc0OH0.guVeW4sz4I8WF0wQTuLYb3CgJvdmUVXqY122HXwWmlE"; // ← à remplacer
+    const SUPABASE_URL = "https://wpewfaibwiigjasocepy.supabase.co"; // 🔁 Remplace par ton URL Supabase
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZXdmYWlid2lpZ2phc29jZXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzNzM3NDgsImV4cCI6MjA2NTk0OTc0OH0.guVeW4sz4I8WF0wQTuLYb3CgJvdmUVXqY122HXwWmlE"; // 🔁 Remplace par ta clé publique "anon"
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    let currentReservations = {};
+
     const articles = [
-       { name: "Chaise haute Sweety Fox", url: "https://www.amazon.fr/dp/B07FDRX1XN" },
+      { name: "Chaise haute Sweety Fox", url: "https://www.amazon.fr/dp/B07FDRX1XN" },
       { name: "Langes Orchestra", url: "https://fr.shop-orchestra.com/fr/puericulture/repas/bavoir-et-lange/lange/lot-de-6-langes-en-coton-70-x-70-cm-PBRIA2.html" },
       { name: "Cube en bois Vertbaudet", url: "https://www.vertbaudet.fr/grand-cube-d-activites-en-bois-fsc-tanzanie.htm" },
-      { name: "Arche d’éveil", url: "https://www.madeinbebe.com/boutique/fr/arche-deveil-promenons-nous-sauthon-baby-deco-385798/a385798" },
+      { name: "Arche d'éveil", url: "https://www.madeinbebe.com/boutique/fr/arche-deveil-promenons-nous-sauthon-baby-deco-385798/a385798" },
       { name: "Bol ventouse Done by Deer", url: "https://donebydeer.com/fr-fr/products/stick-stay-dinner-set-lalee-colour-mix" },
       { name: "Cape de bain Breizh Club", url: "https://www.breizhclub.bzh/accessoires-bebe-et-enfant/1782-cape-de-bain-mariniere-petite-bretonne.html" },
       { name: "Soin Rebozo - Saint-Avé", url: "https://www.unedoulapourunevie.com/rebozo-vannes-morbihan" },
       { name: "Soin Rebozo - à domicile", url: "https://www.infinibiennaitre.fr/soin-rebozo-fermeture-postnatal" }
-   ];
-
-    let currentReservations = {};
+    ];
 
     function checkPassword() {
-      const input = document.getElementById('password').value;
-      if (input === PASSWORD) {
-        document.getElementById('auth').classList.add('hidden');
-        document.getElementById('content').classList.remove('hidden');
+      const input = document.getElementById("password").value;
+      if (input === "mdptest2") {
+        document.getElementById("auth").classList.add("hidden");
+        document.getElementById("content").classList.remove("hidden");
         loadReservations();
       } else {
-        document.getElementById('error').classList.remove('hidden');
+        document.getElementById("error").classList.remove("hidden");
       }
     }
 
     async function loadReservations() {
-      const { data, error } = await supabase.from('reservations').select('*');
-      if (error) return showToast("Erreur chargement", true);
+      const { data, error } = await supabase.from("reservations").select("*");
+      if (error) {
+        showToast("Erreur de chargement", true);
+        return;
+      }
       currentReservations = {};
-      data.forEach(res => currentReservations[res.article] = res.name);
+      data.forEach(entry => {
+        currentReservations[entry.article] = entry.name;
+      });
       renderArticles();
     }
 
     function renderArticles() {
-      const container = document.getElementById('article-grid');
+      const container = document.getElementById("article-grid");
       container.innerHTML = '';
       articles.forEach(article => {
         const reservedBy = currentReservations[article.name];
-        const div = document.createElement('div');
+        const div = document.createElement("div");
         div.className = "bg-white p-4 rounded-xl shadow";
         div.innerHTML = `
           <h2 class="text-lg font-bold text-indigo-700 mb-1">${article.name}</h2>
           <a href="${article.url}" target="_blank" class="text-blue-600 underline text-sm">Voir l'article</a>
           ${reservedBy ? `
             <p class="mt-3 text-sm text-gray-700">Réservé par : <span class="font-semibold">${reservedBy}</span></p>
-            <button onclick="confirmCancel('${article.name}', '${reservedBy}')" class="mt-2 bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600">Annuler</button>
           ` : `
             <button onclick="openModal('${article.name}')" class="mt-3 bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">Je réserve</button>
           `}
@@ -104,65 +105,60 @@
     }
 
     function openModal(item) {
-      document.getElementById('modal').classList.remove('hidden');
-      document.getElementById('modal-item-name').textContent = item;
-      document.getElementById('current-item').value = item;
+      document.getElementById("modal").classList.remove("hidden");
+      document.getElementById("modal-item-name").textContent = item;
+      document.getElementById("current-item").value = item;
+      document.getElementById("reserver-name").value = '';
     }
 
     function closeModal() {
-      document.getElementById('modal').classList.add('hidden');
+      document.getElementById("modal").classList.add("hidden");
     }
 
     async function submitReservation(e) {
       e.preventDefault();
-      const name = document.getElementById('reserver-name').value.trim();
-      const password = document.getElementById('reserver-password').value.trim();
-      const article = document.getElementById('current-item').value;
+      const name = document.getElementById("reserver-name").value.trim();
+      const article = document.getElementById("current-item").value;
 
-      if (!name || !password) return showToast("Nom et mot de passe requis", true);
-      closeModal();
-      const { error } = await supabase.from('reservations').insert({ name, article, password });
-      if (error) {
-        showToast("Réservation échouée", true);
-      } else {
-        showToast("Réservé !");
-        loadReservations();
+      if (!name) {
+        showToast("Nom requis", true);
+        return;
       }
-    }
 
-    async function confirmCancel(article, reservedBy) {
-      const inputName = prompt(`Entrez le nom utilisé pour réserver "${article}" :`);
-      const inputPwd = prompt(`Entrez le mot de passe utilisé :`);
-      if (!inputName || !inputPwd) return;
+      // Vérifie si déjà réservé
+      if (currentReservations[article]) {
+        showToast("Désolé, cet article est déjà réservé.", true);
+        closeModal();
+        return;
+      }
 
-      const { error } = await supabase
-        .from('reservations')
-        .delete()
-        .eq('article', article)
-        .headers({
-          name: inputName,
-          password: inputPwd
-        });
+      closeModal();
+      showToast("Réservation en cours...");
+
+      const { error } = await supabase.from("reservations").insert([{ name, article }]);
 
       if (error) {
-        showToast("Annulation échouée", true);
+        console.error(error);
+        showToast("Erreur lors de l'enregistrement", true);
       } else {
-        showToast("Réservation annulée");
+        showToast("Réservation enregistrée !");
         loadReservations();
       }
     }
 
     function showToast(msg, isError = false) {
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white ${isError ? 'bg-red-500' : 'bg-green-500'}`;
-      toast.classList.remove('hidden');
-      setTimeout(() => toast.classList.add('hidden'), 3000);
+      const toast = document.getElementById("toast");
+      const msgEl = document.getElementById("toast-message");
+      msgEl.textContent = msg;
+      toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg ${isError ? 'bg-red-500' : 'bg-green-500'} text-white`;
+      toast.classList.remove("hidden");
+      setTimeout(() => toast.classList.add("hidden"), 3000);
     }
 
-    document.getElementById('password').addEventListener('keypress', e => {
-      if (e.key === 'Enter') checkPassword();
+    document.getElementById("password").addEventListener("keypress", e => {
+      if (e.key === "Enter") checkPassword();
     });
   </script>
+
 </body>
 </html>
