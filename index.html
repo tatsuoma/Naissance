@@ -90,8 +90,7 @@
   <div id="toast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg hidden">
     <span id="toast-message"></span>
   </div>
-
-   <script>
+  <script>
         // Configuration Supabase (gardez ces valeurs publiques)
         const SUPABASE_URL = "https://wpewfaibwiigjasocepy.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZXdmYWlid2lpZ2phc29jZXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzNzM3NDgsImV4cCI6MjA2NTk0OTc0OH0.guVeW4sz4I8WF0wQTuLYb3CgJvdmUVXqY122HXwWmlE";
@@ -373,7 +372,7 @@
 
                             ${reservedBy ? `
                                 <p class="text-sm text-gray-600 mb-2">Réservé par : <span class="font-semibold">${reservedByName}</span></p>
-                                <button onclick="confirmCancelReservation('${article.name}', '${reservedBy}')" class="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-2 px-3 rounded-lg hover:from-red-500 hover:to-pink-600 transition-all duration-300 font-medium text-sm">Annuler ma réservation</button>
+                                <button onclick="confirmCancelReservation('${article.name}')" class="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-2 px-3 rounded-lg hover:from-red-500 hover:to-pink-600 transition-all duration-300 font-medium text-sm">Annuler ma réservation</button>
                             ` : `
                                 <button onclick="openModal('${article.name}')" class="w-full mt-auto bg-gradient-to-r from-pink-500 to-blue-500 text-white py-2 px-3 rounded-lg hover:from-pink-600 hover:to-blue-600 transition-all duration-300 font-medium text-sm">Réserver</button>
                             `}
@@ -459,15 +458,18 @@
             const code = prompt(`Entrez votre code d'annulation pour "${article}"`);
             if (!code) return;
 
+            showToast("Annulation en cours...");
+
             client.from("reservations")
                 .delete()
                 .eq("article", article)
                 .eq("password", code)
-                .then(({ error }) => {
+                .then(({ error, data }) => {
                     if (error) {
-                        showToast("Code incorrect ou erreur", true);
+                        console.error("Erreur lors de l'annulation:", error);
+                        showToast("Erreur lors de l'annulation", true);
                     } else {
-                        showToast("Réservation annulée");
+                        showToast("Réservation annulée avec succès");
                         loadReservations();
                     }
                 });
@@ -494,5 +496,7 @@
             if (e.key === 'Enter') checkPassword();
         });
     </script>
+
+  
 </body>
 </html>
