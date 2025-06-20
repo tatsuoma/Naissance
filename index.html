@@ -10,12 +10,26 @@
 <body class="bg-gradient-to-br from-indigo-100 via-purple-100 to-blue-100 min-h-screen flex flex-col items-center p-4 font-sans">
 
   <!-- Auth Section -->
-  <div id="auth" class="bg-white rounded-2xl shadow-xl p-6 max-w-md w-full mt-20">
-    <h1 class="text-xl font-semibold mb-4 text-center">Accès à la liste</h1>
-    <input id="password" type="password" placeholder="Mot de passe" class="border p-2 w-full rounded mb-4" />
-    <button onclick="checkPassword()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded w-full">Entrer</button>
-    <p id="error" class="text-red-500 text-sm mt-2 hidden">Mot de passe incorrect</p>
-  </div>
+  <div id="auth" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-pink-100">
+    <div class="bg-white p-8 rounded-lg shadow-xl w-96 text-center">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">Connexion Requise</h2>
+        <form id="login-form">
+            <div class="mb-4">
+                <input type="email" id="email" placeholder="Email"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+            </div>
+            <div class="mb-6">
+                <input type="password" id="password" placeholder="Mot de passe"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" required>
+            </div>
+            <p id="error" class="text-red-500 text-sm mb-4 hidden">Email ou mot de passe incorrect.</p>
+            <button type="submit"
+                    class="w-full bg-gradient-to-r from-pink-500 to-blue-500 text-white py-2 px-4 rounded-lg hover:from-pink-600 hover:to-blue-600 transition-all duration-300 font-semibold">
+                Se connecter
+            </button>
+        </form>
+    </div>
+</div>
 
   <!-- Content -->
   <div id="content" class="hidden w-full max-w-6xl space-y-6">
@@ -91,470 +105,476 @@
     <span id="toast-message"></span>
   </div>
 <script>
-    // Configuration Supabase (seulement URL et clé anon - sécurisé)
-    const SUPABASE_URL = "https://wpewfaibwiigjasocepy.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZXdmYWlid2lpZ2phc29jZXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzNzM3NDgsImV4cCI6MjA2NTk0OTc0OH0.guVeW4sz4I8WF0wQTuLYb3CgJvdmUVXqY122HXwWmlE";
+    // Ces clés sont publiques par nature, mais les RLS (Row Level Security)
+    // sur Supabase protègent vos données côté base de données.
+    const SUPABASE_URL = "https://wpewfaibwiigjasocepy.supabase.co"; // Remplace par ton URL Supabase
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZXdmYWlid2lpZ2phc29jZXB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAzNzM3NDgsImV4cCI6MjA2NTk0OTc0OH0.guVeW4sz4I8WF0wQTuLYb3CgJvdmUVXqY122HXwWmlE";           // Remplace par ta clé anon
     const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Variables globales
-    let currentReservations = {};
-    let currentUser = null;
-
-    // Articles (votre liste existante)
+    // Tes articles peuvent rester ici si tu ne veux pas les stocker dans Supabase
+    // Sinon, tu les chargerais aussi depuis une table 'articles' dans Supabase
     const articles = [
-      {
-        name: "Chaise haute Sweety Fox",
-        url: "https://www.amazon.fr/dp/B07FDRX1XN",
-        image: "images/CHAISE-HAUTE.jpg",
-        category: "Éveil",
-        preferer: "true",
-        subcategory: "Tapis de jeux/éveil pliable & lavable"
-      },
-      {
-        name: "Langes Orchestra",
-        url: "https://fr.shop-orchestra.com/fr/puericulture/repas/bavoir-et-lange/lange/lot-de-6-langes-en-coton-70-x-70-cm-PBRIA2.html",
-        image: "images/LANGES.jpg",
-      },
-      {
-        name: "Cube en bois Vertbaudet",
-        url: "https://www.vertbaudet.fr/grand-cube-d-activites-en-bois-fsc-tanzanie.htm",
-        image: "images/Grand-cube-en-bois.jpg",
-        category: "Éveil",
-        subcategory: "Tapis de jeux/éveil pliable & lavable"
-      },
-      {
-        name: "Arche d'éveil",
-        url: "https://www.madeinbebe.com/boutique/fr/arche-deveil-promenons-nous-sauthon-baby-deco-385798/a385798",
-        image: "images/arche-d'éveil.jpg",
-        category: "Éveil"
-      },
-      {
-        name: "Bol ventouse Done by Deer",
-        url: "https://donebydeer.com/fr-fr/products/stick-stay-dinner-set-lalee-colour-mix",
-        image: "images/Set-assiettes-ventouse.jpg",
-        category: "Éveil"
-      },
-      {
-        name: "Cape de bain Breizh Club",
-        url: "https://www.breizhclub.bzh/accessoires-bebe-et-enfant/1782-cape-de-bain-mariniere-petite-bretonne.html",
-        image: "images/cape-de-bain-mariniere-petite-bretonne.jpg"
-      },
-      {
-        name: "Soin Rebozo - Saint-Avé",
-        url: "https://www.unedoulapourunevie.com/rebozo-vannes-morbihan",
-        image: "images/rebozo.jpg"
-      },
-      {
-        name: "Soin Rebozo - à domicile",
-        url: "https://www.infinibiennaitre.fr/soin-rebozo-fermeture-postnatal",
-        image: "images/rebozo.jpg"
-      },
-      {
-        name: "Gigoteuse brodée en double gaze TOG 2 Promenade Bucolique vert",
-        url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
-        image: "images/gigoteuse.jpg",
-        category: "Puériculture",
-        subcategory: "Gigoteuse",
-      },
-      {
-        name: "Arche d'éveil en bois avec jouets Promenons-nous",
-        url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
-        image: "images/arche.jpg",
-        category: "Éveil"
-      },
-      {
-        name: "Gigoteuse ouatinée TOG 2 en double gaze 6-24M terracotta",
-        url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
-        image: "images/gigoteuse_terracota.jpg",
-        category: "Puériculture",
-        subcategory: "Gigoteuse"
-      },
-      {
-        name: "Jouet Deglingos",
-        url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
-        image: "images/deglingos.jpg",
-        category: "Éveil",
-      },
-      {
-        name: "Miroir pour voiture - Noir/Gris",
-        url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
-        image: "images/miroire.jpg"
-      },
-      {
-        name: "Spirale d'activités en polyester Mes amis les dinos",
-        url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
-        image: "images/spirale.jpg",
-        category: "Éveil"
-      },
-      {
-        name: "Coffret Sophie la Girafe + Anneau de dentition",
-        url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
-        image: "images/girafe.jpg",
-        category: "Éveil"
-      },
-      {
-        name: "Set de 3 hochets poussins oscillants",
-        url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
-        image: "images/hochet.jpg",
-        category: "Éveil"
-      },
-      {
-        name: "Tasse d'apprentissage 360° antifuite Savane",
-        url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
-        image: "images/tasse.jpg"
-      },
-      {
-        name: "Filet de bain baleine Aloha 2.0",
-        url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
-        image: "images/filet.jpg",
-        category: "Bain"
-      },
-      {
-        name: "Jouet de bain 5 moules animaux et filet",
-        url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
-        image: "images/jouet-bain.jpg",
-        category: "Bain"
-      }
-    ];
+  {
+    name: "Chaise haute Sweety Fox",
+    url: "https://www.amazon.fr/dp/B07FDRX1XN",
+    image: "images/CHAISE-HAUTE.jpg",
+     category: "Éveil",
+      preferer: "true", // facultatif
+    subcategory: "Tapis de jeux/éveil pliable & lavable"
+  },
+  {
+    name: "Langes Orchestra",
+    url: "https://fr.shop-orchestra.com/fr/puericulture/repas/bavoir-et-lange/lange/lot-de-6-langes-en-coton-70-x-70-cm-PBRIA2.html",
+    image: "images/LANGES.jpg",
+    
+  },
+  {
+    name: "Cube en bois Vertbaudet",
+    url: "https://www.vertbaudet.fr/grand-cube-d-activites-en-bois-fsc-tanzanie.htm",
+    image: "images/Grand-cube-en-bois.jpg",
+     category: "Éveil",
+    subcategory: "Tapis de jeux/éveil pliable & lavable"
+  },
+  {
+    name: "Arche d'éveil",
+    url: "https://www.madeinbebe.com/boutique/fr/arche-deveil-promenons-nous-sauthon-baby-deco-385798/a385798",
+    image: "images/arche-d'éveil.jpg",
+         category: "Éveil"
 
-    // ===============================
-    // FONCTIONS D'AUTHENTIFICATION SÉCURISÉE
-    // ===============================
+  },
+  {
+    name: "Bol ventouse Done by Deer",
+    url: "https://donebydeer.com/fr-fr/products/stick-stay-dinner-set-lalee-colour-mix",
+    image: "images/Set-assiettes-ventouse.jpg",
+     category: "Éveil"
+  },
+  {
+    name: "Cape de bain Breizh Club",
+    url: "https://www.breizhclub.bzh/accessoires-bebe-et-enfant/1782-cape-de-bain-mariniere-petite-bretonne.html",
+    image: "images/cape-de-bain-mariniere-petite-bretonne.jpg"
+  },
+  {
+    name: "Soin Rebozo - Saint-Avé",
+    url: "https://www.unedoulapourunevie.com/rebozo-vannes-morbihan",
+    image: "images/rebozo.jpg"
+  },
+  {
+    name: "Soin Rebozo - à domicile",
+    url: "https://www.infinibiennaitre.fr/soin-rebozo-fermeture-postnatal",
+    image: "images/rebozo.jpg"
+  },
+  {
+    name: "Gigoteuse brodée en double gaze TOG 2 Promenade Bucolique vert",
+    url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
+    image: "images/gigoteuse.jpg",
+    category: "Puériculture",
+    subcategory: "Gigoteuse",
+  },
+  {
+    name: "Arche d'éveil en bois avec jouets Promenons-nous",
+    url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
+    image: "images/arche.jpg",
+    category: "Éveil"
+  },
+  {
+    name: "Gigoteuse ouatinée TOG 2 en double gaze 6-24M terracotta",
+    url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
+    image: "images/gigoteuse_terracota.jpg",
+    category: "Puériculture",
+    subcategory: "Gigoteuse"
+  },
+  {
+    name: "Jouet Deglingos", // Nom complet non visible
+    url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
+    image: "images/deglingos.jpg",
+    category: "Éveil",
+  },
+  {
+    name: "Miroir pour voiture - Noir/Gris",
+    url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
+    image: "images/miroire.jpg"
+  },
+  {
+    name: "Spirale d'activités en polyester Mes amis les dinos",
+    url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
+    image: "images/spirale.jpg",
+    category: "Éveil"
+  },
+  {
+    name: "Coffret Sophie la Girafe + Anneau de dentition",
+    url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
+    image: "images/girafe.jpg",
+    category: "Éveil"
+  },
+  {
+    name: "Set de 3 hochets poussins oscillants",
+    url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
+    image: "images/hochet.jpg",
+    category: "Éveil"
+  },
+  {
+    name: "Tasse d'apprentissage 360° antifuite Savane",
+    url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
+    image: "images/tasse.jpg"
+  },
+  {
+    name: "Filet de bain baleine Aloha 2.0",
+    url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
+    image: "images/filet.jpg",
+    category: "Bain"
+  },
+  {
+    name: "Jouet de bain 5 moules animaux et filet",
+    url: "https://listedenaissance.shop-orchestra.com/contrib/?birthlist_code=xojvxtFrAOtjHkFUnhnrRQm%252BmbDjrqjFW8j61u3NejM%253D",
+    image: "images/jouet-bain.jpg",
+    category: "Bain"
+  }
 
-    // Vérifier l'authentification au chargement de la page
-    async function checkAuthOnLoad() {
-      try {
-        const { data: { session }, error } = await client.auth.getSession();
-        
-        if (session && session.user) {
-          currentUser = session.user;
-          document.getElementById('auth').classList.add('hidden');
-          document.getElementById('content').classList.remove('hidden');
-          await loadReservations();
+];
+
+    let currentReservations = {};
+    let currentUser = null; // Pour stocker l'utilisateur actuellement connecté
+
+    // 1. Gérer l'état d'authentification initial et les changements
+    // Cette fonction sera appelée à chaque changement d'état (connexion, déconnexion)
+    client.auth.onAuthStateChange((event, session) => {
+        if (session) {
+            currentUser = session.user;
+            document.getElementById('auth').classList.add('hidden');
+            document.getElementById('content').classList.remove('hidden');
+            document.getElementById('logout-button-container').classList.remove('hidden');
+            loadReservations();
+        } else {
+            currentUser = null;
+            document.getElementById('auth').classList.remove('hidden');
+            document.getElementById('content').classList.add('hidden');
+            document.getElementById('logout-button-container').classList.add('hidden');
+            // Optionnel: Réinitialiser la liste si l'utilisateur est déconnecté et que la liste doit être privée
+            // container.innerHTML = ''; // Vide la liste
         }
-      } catch (error) {
-        console.log('Pas de session active');
-      }
-    }
+    });
 
-    // Fonction de connexion sécurisée avec Supabase Auth
-    async function checkPassword() {
-      const email = 'rgabinouch@gmail.com'; // Email fixe pour l'admin
-      const password = document.getElementById('password').value;
-      
-      if (!password) {
-        showError('Mot de passe requis');
-        return;
-      }
+    // 2. Fonction de connexion avec Email/Mot de passe Supabase
+    async function signIn() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
 
-      // Masquer l'erreur précédente
-      document.getElementById('error').classList.add('hidden');
+        if (!email || !password) {
+            return showToast("Veuillez entrer l'email et le mot de passe.", true);
+        }
 
-      try {
+        document.getElementById('error').classList.add('hidden');
+        showToast("Connexion en cours...");
+
         const { data, error } = await client.auth.signInWithPassword({
-          email: email,
-          password: password
+            email: email,
+            password: password,
         });
 
         if (error) {
-          console.error('Erreur auth:', error);
-          showError('Mot de passe incorrect');
-          return;
+            console.error("Erreur de connexion:", error);
+            document.getElementById('error').classList.remove('hidden');
+            document.getElementById('error').textContent = "Erreur de connexion: Email ou mot de passe incorrect.";
+            showToast("Échec de la connexion", true);
+        } else {
+            console.log("Connecté avec succès:", data.user);
+            showToast("Connecté !");
+            // onAuthStateChange gérera l'affichage du contenu
         }
+    }
 
-        if (data.user) {
-          currentUser = data.user;
-          document.getElementById('auth').classList.add('hidden');
-          document.getElementById('content').classList.remove('hidden');
-          document.getElementById('password').value = ''; // Effacer le champ
-          
-          await loadReservations();
+    // 3. Fonction de déconnexion
+    async function signOut() {
+        showToast("Déconnexion en cours...");
+        const { error } = await client.auth.signOut();
+        if (error) {
+            console.error("Erreur de déconnexion:", error);
+            showToast("Erreur lors de la déconnexion", true);
+        } else {
+            showToast("Déconnecté !");
+            // onAuthStateChange gérera l'affichage de la page de connexion
         }
-
-      } catch (error) {
-        console.error('Erreur:', error);
-        showError('Erreur de connexion');
-      }
     }
 
-    // Fonction de déconnexion (optionnelle)
-    async function logout() {
-      try {
-        await client.auth.signOut();
-        currentUser = null;
-        document.getElementById('auth').classList.remove('hidden');
-        document.getElementById('content').classList.add('hidden');
-      } catch (error) {
-        console.error('Erreur déconnexion:', error);
-      }
-    }
-
-    // Écouter les changements d'état d'authentification
-    client.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
-        currentUser = null;
-        document.getElementById('auth').classList.remove('hidden');
-        document.getElementById('content').classList.add('hidden');
-      }
-    });
-
-    // Fonction utilitaire pour afficher les erreurs
-    function showError(message) {
-      const errorDiv = document.getElementById('error');
-      errorDiv.textContent = message;
-      errorDiv.classList.remove('hidden');
-      
-      setTimeout(() => {
-        errorDiv.classList.add('hidden');
-      }, 5000);
-    }
-
-    // ===============================
-    // FONCTIONS MÉTIER (inchangées)
-    // ===============================
 
     async function loadReservations() {
-      try {
-        const { data, error } = await client.from("reservations").select("*");
-        currentReservations = {};
-        if (data) {
-          data.forEach(r => currentReservations[r.article] = { name: r.name });
-        }
-        renderArticles();
-      } catch (error) {
-        console.error('Erreur chargement réservations:', error);
+      // Si la RLS pour SELECT est configurée pour n'autoriser que les utilisateurs authentifiés,
+      // cette requête échouera si currentUser est null.
+      if (!currentUser) return; // Assure-toi d'être connecté avant de charger
+
+      const { data, error } = await client.from("reservations").select("*");
+      currentReservations = {};
+      if (data) {
+        data.forEach(r => currentReservations[r.article] = { name: r.name, user_id: r.user_id, reservation_id: r.id });
       }
+      renderArticles();
     }
 
+    // Garde cette fonction telle quelle, elle est bien
     function renderArticles() {
-      const container = document.getElementById('article-grid');
-      container.innerHTML = '';
+        const container = document.getElementById('article-grid');
+        container.innerHTML = '';
 
-      const grouped = {};
-      const reservedArticles = [];
+        const grouped = {};
+        const reservedArticles = [];
 
-      // Séparer les articles réservés et non réservés
-      articles.forEach(article => {
-        const reservedBy = currentReservations[article.name];
-        if (reservedBy) {
-          reservedArticles.push(article);
-        } else {
-          const category = article.category || 'Suggestion du chef';
-          const subcategory = article.subcategory || '';
-
-          if (!grouped[category]) grouped[category] = {};
-          if (!grouped[category][subcategory]) grouped[category][subcategory] = [];
-          grouped[category][subcategory].push(article);
-        }
-      });
-
-      // Fonction pour générer une section d'articles
-      function generateCategorySection(title, subcategories) {
-        const categoryWrapper = document.createElement('div');
-        categoryWrapper.className = "mb-8";
-
-        const categoryTitle = document.createElement('h2');
-        categoryTitle.className = "text-2xl font-bold text-gray-800 mb-6 flex items-center";
-        categoryTitle.innerHTML = `<div class="w-1 h-8 bg-gradient-to-b from-pink-500 to-blue-500 mr-3 rounded"></div>${title}`;
-        categoryWrapper.appendChild(categoryTitle);
-
-        Object.entries(subcategories).forEach(([subcategory, articlesList]) => {
-          const subWrapper = document.createElement('div');
-          subWrapper.className = "mb-6";
-
-          if (subcategory.trim() !== '') {
-            const subTitle = document.createElement('h3');
-            subTitle.className = "text-lg font-semibold text-gray-700 mb-3 pl-4 border-l-2 border-pink-300";
-            subTitle.textContent = subcategory;
-            subWrapper.appendChild(subTitle);
-          }
-
-          const grid = document.createElement('div');
-          grid.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4";
-
-          articlesList.forEach(article => {
+        articles.forEach(article => {
             const reservedBy = currentReservations[article.name];
-            const reservedByName = reservedBy?.user || reservedBy?.name || reservedBy || '';
+            if (reservedBy) {
+                reservedArticles.push(article);
+            } else {
+                const category = article.category || 'Suggestion du chef';
+                const subcategory = article.subcategory || '';
 
-            const articleDiv = document.createElement('div');
-            articleDiv.className = "bg-white rounded-lg shadow-md p-4 transition-all duration-300 hover:shadow-lg border-l-4 border-gray-200 hover:border-pink-300 flex flex-col";
-
-            const brandBadge = article.brand === 'Orchestra'
-              ? `<span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full mb-2">🎵 Orchestra</span>`
-              : '';
-
-            const imageHTML = article.image
-              ? article.url
-                ? `<a href="${article.url}" target="_blank" rel="noopener noreferrer">
-                     <img src="${article.image}" alt="${article.name}" class="mx-auto h-48 rounded mb-4">
-                   </a>`
-                : `<img src="${article.image}" alt="${article.name}" class="mx-auto h-48 rounded mb-4">`
-              : '';
-
-            const linkHTML = article.url
-              ? `<a href="${article.url}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:text-blue-700 transition-colors" title="Voir le produit">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    class="lucide lucide-external-link">
-                    <path d="M15 3h6v6"></path>
-                    <path d="M10 14 21 3"></path>
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                  </svg>
-                </a>`
-              : '';
-
-            articleDiv.innerHTML = `
-              ${imageHTML}
-              <div class="flex justify-between items-start mb-3">
-                <div class="flex-1">
-                  ${brandBadge}
-                  <h4 class="font-medium text-gray-800 text-sm leading-tight">${article.name}</h4>
-                </div>
-                <div class="flex items-center ml-2 space-x-2">
-                  ${linkHTML}
-                </div>
-              </div>
-
-              ${reservedBy ? `
-                <p class="text-sm text-gray-600 mb-2">Réservé par : <span class="font-semibold">${reservedByName}</span></p>
-                <button onclick="confirmCancelReservation('${article.name}', '${reservedBy}')" class="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-2 px-3 rounded-lg hover:from-red-500 hover:to-pink-600 transition-all duration-300 font-medium text-sm">Annuler ma réservation</button>
-              ` : `
-                <button onclick="openModal('${article.name}')" class="w-full mt-auto bg-gradient-to-r from-pink-500 to-blue-500 text-white py-2 px-3 rounded-lg hover:from-pink-600 hover:to-blue-600 transition-all duration-300 font-medium text-sm">Réserver</button>
-              `}
-            `;
-
-            grid.appendChild(articleDiv);
-          });
-
-          subWrapper.appendChild(grid);
-          categoryWrapper.appendChild(subWrapper);
+                if (!grouped[category]) grouped[category] = {};
+                if (!grouped[category][subcategory]) grouped[category][subcategory] = [];
+                grouped[category][subcategory].push(article);
+            }
         });
 
-        container.appendChild(categoryWrapper);
-      }
+        function generateCategorySection(title, subcategories) {
+            const categoryWrapper = document.createElement('div');
+            categoryWrapper.className = "mb-8";
 
-      // Afficher les catégories normales
-      Object.entries(grouped).forEach(([category, subcategories]) => {
-        generateCategorySection(category, subcategories);
-      });
+            const categoryTitle = document.createElement('h2');
+            categoryTitle.className = "text-2xl font-bold text-gray-800 mb-6 flex items-center";
+            categoryTitle.innerHTML = `<div class="w-1 h-8 bg-gradient-to-b from-pink-500 to-blue-500 mr-3 rounded"></div>${title}`;
+            categoryWrapper.appendChild(categoryTitle);
 
-      // Ajouter la section "Articles réservés"
-      if (reservedArticles.length > 0) {
-        const reservedGrouped = { '': reservedArticles };
-        generateCategorySection("Articles réservés", reservedGrouped);
-      }
+            Object.entries(subcategories).forEach(([subcategory, articlesList]) => {
+                const subWrapper = document.createElement('div');
+                subWrapper.className = "mb-6";
 
-      updateProgressBar();
+                if (subcategory.trim() !== '') {
+                    const subTitle = document.createElement('h3');
+                    subTitle.className = "text-lg font-semibold text-gray-700 mb-3 pl-4 border-l-2 border-pink-300";
+                    subTitle.textContent = subcategory;
+                    subWrapper.appendChild(subTitle);
+                }
+
+                const grid = document.createElement('div');
+                grid.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4";
+
+                articlesList.forEach(article => {
+                    const reservedBy = currentReservations[article.name];
+                    const reservedByName = reservedBy?.name || ''; // Nom de la personne qui a réservé
+                    const isReservedByCurrentUser = currentUser && reservedBy?.user_id === currentUser.id; // Vérifie si c'est la réservation de l'utilisateur actuel
+
+                    const articleDiv = document.createElement('div');
+                    articleDiv.className = "bg-white rounded-lg shadow-md p-4 transition-all duration-300 hover:shadow-lg border-l-4 border-gray-200 hover:border-pink-300 flex flex-col";
+
+                    const brandBadge = article.brand === 'Orchestra'
+                        ? `<span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full mb-2">🎵 Orchestra</span>`
+                        : '';
+
+                    const imageHTML = article.image
+                        ? article.url
+                            ? `<a href="${article.url}" target="_blank" rel="noopener noreferrer">
+                                <img src="${article.image}" alt="${article.name}" class="mx-auto h-48 rounded mb-4">
+                            </a>`
+                            : `<img src="${article.image}" alt="${article.name}" class="mx-auto h-48 rounded mb-4">`
+                        : '';
+
+                    const linkHTML = article.url
+                        ? `<a href="${article.url}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:text-blue-700 transition-colors" title="Voir le produit">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-external-link">
+                                <path d="M15 3h6v6"></path>
+                                <path d="M10 14 21 3"></path>
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            </svg>
+                        </a>`
+                        : '';
+
+                    articleDiv.innerHTML = `
+                        ${imageHTML}
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex-1">
+                                ${brandBadge}
+                                <h4 class="font-medium text-gray-800 text-sm leading-tight">${article.name}</h4>
+                            </div>
+                            <div class="flex items-center ml-2 space-x-2">
+                                ${linkHTML}
+                            </div>
+                        </div>
+
+                        ${reservedBy ? `
+                            <p class="text-sm text-gray-600 mb-2">Réservé par : <span class="font-semibold">${reservedByName}</span></p>
+                            ${isReservedByCurrentUser ? `
+                                <button onclick="confirmCancelReservation('${article.name}')" class="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-2 px-3 rounded-lg hover:from-red-500 hover:to-pink-600 transition-all duration-300 font-medium text-sm">Annuler ma réservation</button>
+                            ` : `
+                                <button class="w-full bg-gray-300 text-gray-700 py-2 px-3 rounded-lg cursor-not-allowed font-medium text-sm" disabled>Déjà réservé</button>
+                            `}
+                        ` : `
+                            <button onclick="openModal('${article.name}')" class="w-full mt-auto bg-gradient-to-r from-pink-500 to-blue-500 text-white py-2 px-3 rounded-lg hover:from-pink-600 hover:to-blue-600 transition-all duration-300 font-medium text-sm">Réserver</button>
+                        `}
+                    `;
+
+                    grid.appendChild(articleDiv);
+                });
+
+                subWrapper.appendChild(grid);
+                categoryWrapper.appendChild(subWrapper);
+            });
+
+            container.appendChild(categoryWrapper);
+        }
+
+        Object.entries(grouped).forEach(([category, subcategories]) => {
+            generateCategorySection(category, subcategories);
+        });
+
+        if (reservedArticles.length > 0) {
+            const reservedGrouped = { '': reservedArticles };
+            generateCategorySection("Articles réservés", reservedGrouped);
+        }
+
+        updateProgressBar();
     }
 
+
     function updateProgressBar() {
-      const total = articles.length;
-      const reserved = Object.keys(currentReservations).length;
+        const total = articles.length;
+        const reserved = Object.keys(currentReservations).length;
 
-      const percent = Math.round((reserved / total) * 100);
-      const bar = document.getElementById('progress-bar');
-      const text = document.getElementById('progress-text');
+        const percent = Math.round((reserved / total) * 100);
+        const bar = document.getElementById('progress-bar');
+        const text = document.getElementById('progress-text');
 
-      if (bar) bar.style.width = `${percent}%`;
-      if (text) text.textContent = `${reserved} sur ${total} articles réservés`;
+        if (bar) bar.style.width = `${percent}%`;
+        if (text) text.textContent = `${reserved} sur ${total} articles réservés`;
     }
 
     function openModal(item) {
-      document.getElementById("modal").classList.remove("hidden");
-      document.getElementById("modal-item-name").textContent = item;
-      document.getElementById("current-item").value = item;
-      document.getElementById("reserver-name").value = '';
+        document.getElementById("modal").classList.remove("hidden");
+        document.getElementById("modal-item-name").textContent = item;
+        document.getElementById("current-item").value = item;
+        document.getElementById("reserver-name").value = ''; // Réinitialise le champ nom
+        // Pré-remplir le nom avec l'email de l'utilisateur connecté si disponible
+        if (currentUser && currentUser.email) {
+            document.getElementById("reserver-name").value = currentUser.email.split('@')[0]; // Exemple: "monnom" si email est "monnom@example.com"
+        }
     }
 
     function closeModal() {
-      document.getElementById("modal").classList.add("hidden");
+        document.getElementById("modal").classList.add("hidden");
     }
 
-    function generateSecretCode(length = 6) {
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let result = '';
-      for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return result;
-    }
+    // La fonction generateSecretCode n'est plus nécessaire pour l'annulation
+    // car on utilisera l'ID utilisateur de Supabase et les RLS.
+    // function generateSecretCode(length = 6) { ... }
 
+    // 4. Soumettre la réservation (nécessite d'être authentifié)
     async function submitReservation(e) {
-      e.preventDefault();
-      const name = document.getElementById('reserver-name').value.trim();
-      const article = document.getElementById('current-item').value;
-      const password = generateSecretCode();
+        e.preventDefault();
+        const name = document.getElementById('reserver-name').value.trim();
+        const article = document.getElementById('current-item').value;
 
-      if (!name) return showToast("Nom requis", true);
+        if (!name) return showToast("Votre nom requis", true);
+        if (!currentUser) {
+            showToast("Vous devez être connecté pour réserver un article.", true);
+            closeModal();
+            return;
+        }
 
-      closeModal();
-      showToast("Réservation en cours...");
+        closeModal();
+        showToast("Réservation en cours...");
 
-      try {
-        const { error } = await client.from("reservations").insert([{ name, article, password }]);
+        const { data, error } = await client.from("reservations").insert([{
+            name: name,
+            article: article,
+            user_id: currentUser.id // Stocke l'ID de l'utilisateur qui a réservé
+        }]);
 
         if (error) {
-          console.error(error);
-          showToast("Erreur de réservation", true);
+            console.error("Erreur de réservation:", error);
+            showToast("Erreur de réservation: " + error.message, true);
         } else {
-          showConfirmationModal(password);
-          loadReservations();
+            showToast("Réservation effectuée !");
+            // Plus besoin de showConfirmationModal avec un code, car l'annulation sera basée sur l'utilisateur connecté.
+            loadReservations(); // Recharge les réservations pour mettre à jour l'interface
         }
-      } catch (error) {
-        console.error('Erreur:', error);
-        showToast("Erreur de réservation", true);
-      }
     }
 
-    function confirmCancelReservation(article) {
-      const code = prompt(`Entrez votre code d'annulation pour "${article}"`);
-      if (!code) return;
+    // 5. Annuler la réservation (nécessite d'être authentifié et d'être le "propriétaire" de la réservation)
+    function confirmCancelReservation(articleName) {
+        if (!currentUser) {
+            showToast("Vous devez être connecté pour annuler une réservation.", true);
+            return;
+        }
 
-      client.from("reservations")
-        .delete()
-        .eq("article", article)
-        .eq("password", code)
-        .then(({ error }) => {
-          if (error) {
-            showToast("Code incorrect ou erreur", true);
-          } else {
-            showToast("Réservation annulée");
-            loadReservations();
-          }
-        });
+        const reservation = currentReservations[articleName];
+        if (!reservation || reservation.user_id !== currentUser.id) {
+            showToast("Vous ne pouvez annuler que vos propres réservations.", true);
+            return;
+        }
+
+        // Pour un feedback visuel, vous pouvez demander une confirmation réelle ici, par exemple :
+        if (!confirm(`Êtes-vous sûr de vouloir annuler la réservation de "${articleName}" ?`)) {
+            return;
+        }
+
+        showToast("Annulation en cours...");
+
+        // On supprime la réservation par son ID unique pour être plus précis.
+        // Assurez-vous que votre table 'reservations' a une colonne 'id' de type `uuid` (colonne par défaut pour les PK dans Supabase)
+        // et que la politique RLS pour DELETE autorise la suppression par le `user_id`.
+        client.from("reservations")
+            .delete()
+            .eq("id", reservation.reservation_id) // Supprime par l'ID de la réservation
+            .eq("user_id", currentUser.id) // Ajoute cette condition pour la sécurité côté client (même si RLS le fait)
+            .then(({ error }) => {
+                if (error) {
+                    console.error("Erreur d'annulation:", error);
+                    showToast("Erreur d'annulation: " + error.message, true);
+                } else {
+                    showToast("Réservation annulée !");
+                    loadReservations(); // Recharge les réservations
+                }
+            });
     }
 
     function showToast(msg, isError = false) {
-      const toast = document.getElementById("toast");
-      document.getElementById("toast-message").textContent = msg;
-      toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white ${isError ? "bg-red-500" : "bg-green-500"}`;
-      toast.classList.remove("hidden");
-      setTimeout(() => toast.classList.add("hidden"), 3000);
+        const toast = document.getElementById("toast");
+        document.getElementById("toast-message").textContent = msg;
+        toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white ${isError ? "bg-red-500" : "bg-green-500"}`;
+        toast.classList.remove("hidden");
+        setTimeout(() => toast.classList.add("hidden"), 3000);
     }
 
-    function showConfirmationModal(code) {
-      document.getElementById("confirmation-code").textContent = code;
-      document.getElementById("confirmation-modal").classList.remove("hidden");
-    }
-
-    function closeConfirmationModal() {
-      document.getElementById("confirmation-modal").classList.add("hidden");
-    }
-
-    // ===============================
-    // INITIALISATION
-    // ===============================
-
-    // Event listeners
-    document.addEventListener('DOMContentLoaded', () => {
-      // Vérifier l'authentification au chargement
-      checkAuthOnLoad();
-      
-      // Event listener pour le formulaire de connexion
-      document.getElementById('password')?.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') checkPassword();
-      });
+    // Écouteur d'événements pour le formulaire de connexion
+    document.getElementById('login-form').addEventListener('submit', e => {
+        e.preventDefault(); // Empêche le rechargement de la page
+        signIn();
     });
+
+    // Écouteur d'événements pour le formulaire de réservation
+    document.getElementById('reservation-form').addEventListener('submit', submitReservation);
+
+    // Initialisation: vérifier si un utilisateur est déjà connecté au chargement de la page
+    // client.auth.getSession() ne sera pas toujours nécessaire si onAuthStateChange est là,
+    // mais peut être utile si tu veux forcer une vérification au chargement initial.
+    async function initializeAuth() {
+        const { data: { session } } = await client.auth.getSession();
+        if (session) {
+            currentUser = session.user;
+            document.getElementById('auth').classList.add('hidden');
+            document.getElementById('content').classList.remove('hidden');
+            document.getElementById('logout-button-container').classList.remove('hidden');
+            loadReservations();
+        } else {
+            document.getElementById('auth').classList.remove('hidden');
+            document.getElementById('content').classList.add('hidden');
+            document.getElementById('logout-button-container').classList.add('hidden');
+        }
+    }
+    initializeAuth(); // Appelle cette fonction au démarrage
+
+    // Pas besoin de showConfirmationModal / closeConfirmationModal
+    // car le "code secret" n'est plus utilisé.
+    // function showConfirmationModal(code) { ... }
+    // function closeConfirmationModal() { ... }
 
 </script>
 </body>
